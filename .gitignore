@@ -7,7 +7,7 @@
 .RDataTmp
 
 # CSV Excel Files
-.csv
+*.csv
 
 # User-specific files
 .Ruserdata
