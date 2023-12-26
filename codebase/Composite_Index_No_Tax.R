@@ -187,8 +187,8 @@ reg_composite = lm(Net_revenue ~ streamflow + CDD + Natural_Gas,
 composite_index <- get_composite_strike(lower = 0.05,
                                         upper = 0.2,
                                         composite_regression = reg_composite,
-                                        portfolio_rev = reg_composite$model[,1],
-                                        method = "same_thresh",
+                                        portfolio_rev = hedged_net_revenues_portfolio,
+                                        method = "same_var",
                                         thresh = 0.15)
 
 
