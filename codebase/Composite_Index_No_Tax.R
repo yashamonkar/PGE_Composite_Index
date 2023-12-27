@@ -475,7 +475,8 @@ basis_risk$Composite[basis_risk$Composite > 0] <- 1
 basis_risk$Portfolio[basis_risk$Portfolio > 0] <- 1
 
 #Overpayments of the composite index
-
+table(basis_risk$Unhedhged, basis_risk$Composite)/sum(basis_risk$Composite)
+table(basis_risk$Unhedhged, basis_risk$Portfolio)/sum(basis_risk$Portfolio)
 
 
 #----------------------------------------------------------------------#
