@@ -8,7 +8,9 @@
 
 ###For each regression, the data are divided into training and testing
 ###The model fit is assessed. 
-### For computing the strike, all the data (predicted values) are used. 
+### For computing the strike, all the data (predicted values) are used.
+
+#Comment on removing the last point:- The outlier reduces the ability to increase the peak. 
 
 
 #Point towards the working directory. 
@@ -424,7 +426,7 @@ legend("topleft", legend=c("Unmanaged", "Composite Index"),
 
 
 ###-------------Composite Index-------------------#
-Composite_index <- match_var(upper=0.2,
+Composite_index <- match_var(upper=0.3,
                              lower=0.01,
                              reg=reg_composite,
                              newdata = data.frame(streamflow = reg_dataset$streamflow,
@@ -463,6 +465,16 @@ print(paste0("The 5th percentile of Unmanaged net revenues is ", 1000*quantile(r
 print(paste0("The 5th percentile of portfolio index is ", 1000*quantile(hedged_net_revenues_portfolio, 0.05)))
 print(paste0("The 5th percentile  of composite index is ", 1000*quantile(Composite_index$hedged_revenue, 0.05)))
 
+#Measure of basis risk
+basis_risk <- data.frame(Unhedhged = reg_dataset$Net_revenue,
+                         Composite = Composite_index$Payout,
+                         Portfolio = payout_portfolio)
+cond <- basis_risk$Unhedhged < quantile(reg_dataset$Net_revenue, Composite_index$strike)
+basis_risk$Unhedhged <- as.numeric(cond)
+basis_risk$Composite[basis_risk$Composite > 0] <- 1
+basis_risk$Portfolio[basis_risk$Portfolio > 0] <- 1
+
+#Overpayments of the composite index
 
 
 
