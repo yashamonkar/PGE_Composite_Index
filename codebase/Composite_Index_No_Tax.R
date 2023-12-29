@@ -25,7 +25,6 @@ library(gridExtra)
 library(cowplot)
 library(ggpattern)
 
-#Load Functions
 
 #______________________________________________________________________#
 #Initial Data Wrangling
@@ -54,7 +53,7 @@ reg_dataset <- data.frame(streamflow = log(streamflow),
 reg_dataset <- reg_dataset[-which.min(reg_dataset$Net_revenue), ]
 
 
-pdf("figures/Risk_mitigation_no_tax_v2.pdf", height=3700/600, width=6500/600)
+pdf("figures/Risk_mitigation_no_tax.pdf", height=3700/600, width=6500/600)
 
 #______________________________________________________________________#
 #Divide into training and testing. 
