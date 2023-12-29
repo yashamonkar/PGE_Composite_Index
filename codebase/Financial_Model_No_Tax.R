@@ -10,12 +10,11 @@ setwd("~/GitHub/PGE_Composite_Index")
 
 #______________________________________________________________________________#
 ###Load the libraries###
-
 library(dplyr)
 library(corrplot)
 
 
-
+#Setup the PDF for the figures
 pdf("figures/financial_model_no_tax.pdf")
 
 #______________________________________________________________________________#
@@ -31,16 +30,13 @@ streamflow <- read.csv("data/Streamflow.csv")
 CDD <- read.csv("data/CDD.csv")
 Yearly_gas <- read.csv("data/Yearly_gas.csv", header = FALSE)
 
-#Load Profile -- Might not need
+#Load Profile 
 Load_profile <- read.csv("data/Load_Profile.csv", header = FALSE)
 
 
 
 #______________________________________________________________________________#
 ###Model Hyper-parameters###
-
-#Current Scenario 
-cur_sce = 'Weighted_No_Tax'
 N_years <- 500
 
 
@@ -86,20 +82,19 @@ Delivery_charge = 0.046
 
 
 #Seasonal Rates
-Res_rate_summer =  0.1838*2*0.210515/(0.210515+0.158485)  # 0.210515   #0.1838 #
-Res_rate_winter = 0.1838*2*0.158485/(0.210515+0.158485) # 0.158485  
-Com_rate_summer = 0.1627*2*0.198315 /(0.198315 +0.147685) #0.198315  
-Com_rate_winter = 0.1627*2*0.147685 /(0.198315 +0.147685) #0.147685  #0.1627 #
-Ind_rate = 0.1010 #0.1085  #0.1010 #
-Ag_rate_summer = .1968*2*0.246315/(0.246315+0.195685)  # 0.246315  #0.1968 #
-Ag_rate_winter = 0.1968*2*0.195685/(0.246315+0.195685)  #0.195685 
+Res_rate_summer = 0.2097163 #cents/kwhr
+Res_rate_winter = 0.1578837 #cents/kwhr
+Com_rate_summer = 0.1865078 #cents/kwhr
+Com_rate_winter = 0.1388922 #cents/kwhr
+Ind_rate = 0.1010 #cents/kwhr
+Ag_rate_summer = 0.219343 #cents/kwhr
+Ag_rate_winter = 0.174257 #cents/kwhr
 
 #Percent of sectoral load met by PG&E
-#pct_now = c(0.831384629, 0.97790101, 0.700178588, 0.587734342)
 pct_now = c(0.811384629, 0.75790101, 0.850178588, 0.757734342)
 
 #Model Generation Costs
-Model_gen_cost = 0 #0.04074746726194548 #Yash - This is useless. 
+Model_gen_cost = 0  #Yash - This is useless. 
 
 
 
@@ -130,7 +125,7 @@ for(yr in 1:N_years) {
   year_demand = Demand[(1+(yr-1)*8760):(yr*8760),]
   
   #PGE DElivery portion
-  PGE_delivery_load <- year_demand*0.8
+  PGE_delivery_load <- year_demand*0.82
   
   
   #----------------------------------------------------------------------#
@@ -168,7 +163,7 @@ for(yr in 1:N_years) {
   #Solar
   name3 = paste0("data/no_tax/PGE_Solar_",yr-1,".csv")
   PGE_solar = read.csv(name3, sep = ",", header = FALSE)
-  PGE_owned_solar = PGE_solar * (PGE_owned_solar_capacity_MW / Solar_cap_in_region) ###THIS LINE COULD BE WRONG
+  PGE_owned_solar = PGE_solar * (PGE_owned_solar_capacity_MW / Solar_cap_in_region) 
   PGE_total_annual_solar = sum(PGE_solar)
   
   #Wind
@@ -201,7 +196,7 @@ for(yr in 1:N_years) {
   
   #Total PPA and Qualifying Gens Cost
   Total_PPAs = PGE_PPA_hydro + PGE_PPA_solar[,1] + PGE_PPA_wind[,1]
-  hourly_PPA_cost = Total_PPAs * PPA_cost_per_MWh + PGE_QF * QF_cost_per_MWh   #MISTAKE FIXED
+  hourly_PPA_cost = Total_PPAs * PPA_cost_per_MWh + PGE_QF * QF_cost_per_MWh   
   Total_PPAs_cost = sum(Total_PPAs * PPA_cost_per_MWh) + sum(PGE_QF * QF_cost_per_MWh)
   
   #----------------------------------------------------------------------------------------#
