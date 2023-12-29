@@ -386,7 +386,7 @@ streamflow = streamflow[,sites]
 streamflow = rowMeans(streamflow)
 
 ###CDD
-pge_cities = c('FRESNO_T', 'SACRAMENTO_T','SAN.JOSE_T')
+pge_cities = c('FRESNO_T', 'SACRAMENTO_T','SAN.JOSE_T', 'SAN.FRANCISCO_T')
 CDD = CDD[,pge_cities]
 CDD = rowMeans(CDD)
 

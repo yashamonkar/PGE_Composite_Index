@@ -40,15 +40,15 @@ streamflow = streamflow[,sites]
 streamflow = rowMeans(streamflow)
 
 ###CDD
-pge_cities = c('FRESNO_T', 'SACRAMENTO_T','SAN.JOSE_T')
+pge_cities = c('FRESNO_T', 'SACRAMENTO_T','SAN.JOSE_T', 'SAN.FRANCISCO_T')
 CDD = CDD[,pge_cities]
 CDD = rowMeans(CDD)
 
 
 #Set-up regression dataset
-reg_dataset <- data.frame(streamflow = log(streamflow), 
-                          CDD = CDD,
-                          Natural_Gas = Yearly_gas$V1,
+reg_dataset <- data.frame(streamflow = scale(log(streamflow)), 
+                          CDD = scale(CDD),
+                          Natural_Gas = scale(Yearly_gas$V1),
                           Net_revenue = net_revenue$Net_revenue)
 reg_dataset <- reg_dataset[-which.min(reg_dataset$Net_revenue), ]
 
