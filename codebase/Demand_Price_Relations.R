@@ -5,7 +5,7 @@ setwd("~/GitHub/PGE_Composite_Index")
 library(ggplot2)
 
 
-pdf("figures/Demand_Price_CDD_Diagnostics.pdf")
+pdf("figures/Demand_Price_CDD_Diagnostics_Annual.pdf")
 
 ###Deamnd Data###
 Demand <- read.csv("data/Simulated_Demand.csv", header = FALSE)
@@ -57,12 +57,15 @@ ggplot(plt_dataset) +
   ggtitle("Price vs Demand") +
   theme_bw()
 
+dev.off()
 
 
 #-------------Daily Time Scale-----------------------------#
+
+pdf("figures/Demand_Price_CDD_Diagnostics_Hourly.pdf")
+
 plt_dataset <- data.frame(Demand = daily_demand,
                           Price = daily_price)
-
 
 
 ggplot(plt_dataset) +
