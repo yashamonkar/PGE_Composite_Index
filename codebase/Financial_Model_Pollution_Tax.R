@@ -39,10 +39,8 @@ Load_profile <- read.csv("data/Load_Profile.csv", header = FALSE)
 
 #______________________________________________________________________________#
 ###Model Hyper-parameters###
-
-#Current Scenario 
-cur_sce = 'Weighted_Pollution_Tax'
 N_years <- 500
+avg_price_increase <- 5.22486 #$/Mwhr
 
 
 #------------------------------------------------------------------------------#
@@ -78,8 +76,8 @@ nuclear_fuel_costs = 7.45 # $/MWh.
 ###--------Cost data--------------###
 
 #PPA and Qualifying Generators Costs
-PPA_cost_per_MWh = 106.2 #These might have to increase
-QF_cost_per_MWh = 33.1553 #These might have to increase.
+PPA_cost_per_MWh = 106.2 + avg_price_increase
+QF_cost_per_MWh = 33.1553 + avg_price_increase
 
 
 #Delivery Costs
@@ -87,20 +85,19 @@ Delivery_charge = 0.046
 
 
 #Seasonal Rates
-Res_rate_summer =  0.1838*2*0.210515/(0.210515+0.158485)  # 0.210515   #0.1838 #
-Res_rate_winter = 0.1838*2*0.158485/(0.210515+0.158485) # 0.158485  
-Com_rate_summer = 0.1627*2*0.198315 /(0.198315 +0.147685) #0.198315  
-Com_rate_winter = 0.1627*2*0.147685 /(0.198315 +0.147685) #0.147685  #0.1627 #
-Ind_rate = 0.1010 #0.1085  #0.1010 #
-Ag_rate_summer = .1968*2*0.246315/(0.246315+0.195685)  # 0.246315  #0.1968 #
-Ag_rate_winter = 0.1968*2*0.195685/(0.246315+0.195685)  #0.195685 
+Res_rate_summer = 0.2097163 #cents/kwhr
+Res_rate_winter = 0.1578837 #cents/kwhr
+Com_rate_summer = 0.1865078 #cents/kwhr
+Com_rate_winter = 0.1388922 #cents/kwhr
+Ind_rate = 0.1010 #cents/kwhr
+Ag_rate_summer = 0.219343 #cents/kwhr
+Ag_rate_winter = 0.174257 #cents/kwhr
 
 #Percent of sectoral load met by PG&E
-#pct_now = c(0.831384629, 0.97790101, 0.700178588, 0.587734342)
 pct_now = c(0.811384629, 0.75790101, 0.850178588, 0.757734342)
 
 #Model Generation Costs
-Model_gen_cost = 0 #0.04074746726194548 #Yash - This is useless. 
+Model_gen_cost = 0 #Internal Accounting
 
 
 
@@ -114,7 +111,7 @@ months <- seq(st_date, end_date, by ="hours")
 months <- as.numeric(format(months, "%m"))
 
 
-#Tax on Thermal Plants
+#Tax on Thermal Plants Source Zeighami et al 
 thermal_tax <- c(7.911343, 34.68308, 34.68308, 1.383465)
 
 
@@ -161,7 +158,7 @@ for(yr in 1:N_years) {
   Thermal_gen = PGE_gen[, 1:4] #First four rows are thermal plants
   Thermal_cost = PGE_gen_cost[,1:4]
   for (i in 1:ncol(Thermal_cost)) {
-    Thermal_cost[,i] <-  Thermal_cost[,i] + thermal_tax[i]
+    Thermal_cost[,i] <-  Thermal_cost[,i] + thermal_tax[i]  #Tax added to the costs.
   }
   Total_Thermal_cost = Thermal_gen*Thermal_cost
   
