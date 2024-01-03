@@ -15,7 +15,8 @@ setwd("~/GitHub/PGE_Composite_Index")
 library(dplyr)
 library(corrplot)
 
-
+#Load Functions
+source("functions/get_revenue_comp.R")
 
 pdf("figures/financial_model_pollution_tax.pdf")
 
@@ -85,13 +86,13 @@ Delivery_charge = 0.046
 
 
 #Seasonal Rates
-Res_rate_summer = 0.2097163 #cents/kwhr
-Res_rate_winter = 0.1578837 #cents/kwhr
-Com_rate_summer = 0.1865078 #cents/kwhr
-Com_rate_winter = 0.1388922 #cents/kwhr
-Ind_rate = 0.1010 #cents/kwhr
-Ag_rate_summer = 0.219343 #cents/kwhr
-Ag_rate_winter = 0.174257 #cents/kwhr
+Res_rate_summer = 0.2097163 + avg_price_increase/1000 #$/kwhr
+Res_rate_winter = 0.1578837 + avg_price_increase/1000 #$/kwhr
+Com_rate_summer = 0.1865078 + avg_price_increase/10006 #$/kwhr
+Com_rate_winter = 0.1388922 + avg_price_increase/1000 #$/kwhr
+Ind_rate = 0.1010 + avg_price_increase/1000 #$/kwhr
+Ag_rate_summer = 0.219343 + avg_price_increase/1000 #$/kwhr
+Ag_rate_winter = 0.174257 + avg_price_increase/1000 #$/kwhr
 
 #Percent of sectoral load met by PG&E
 pct_now = c(0.811384629, 0.75790101, 0.850178588, 0.757734342)
@@ -556,6 +557,11 @@ dev.off()
 
 
 
+#______________________________________________________________________________#
+#Final Plots for the paper
+no_tax_rev <- read.csv("sims/Net_Revenue_no_tax.csv", header = TRUE, sep=",")
 
-
-
+pdf("figures/paper/Revenue_Comparision.pdf",height=7, width=9)
+get_revenue_comp(tax = fin_results$Net_Revenue, 
+                 no_tax = no_tax_rev$Net_revenue)
+dev.off()

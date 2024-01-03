@@ -14,6 +14,12 @@ library(dplyr)
 library(corrplot)
 
 
+#Load Functions
+source("functions/get_validation_plots.R")
+source("functions/get_revenue_dependence.R")
+source("functions/get_corr_plot.R")
+
+
 #Setup the PDF for the figures
 pdf("figures/financial_model_no_tax.pdf")
 
@@ -505,6 +511,9 @@ hist(unlist(Total_Deliveries), col ='grey', ylab = "All Years", xlab = "GWhr",
      cex.lab = 1.5)
 points(pge_deliveries, rep(20,3), pch = 19, col ='black', cex = 1.2)
 
+
+
+
 #______________________________________________________________________________#
 ###Plot2 
 
@@ -652,21 +661,31 @@ pairs(plt_dataset, lower.panel = lower.panel,
       cex.main = 2)
 
 
+dev.off()
 
+#__________________________________________________________________________________#
+#Final Plots for paper
 
+#Validation
+pdf("figures/paper/Validation.pdf",height=7, width=14)
+get_validation(Deliveries = unlist(Total_Deliveries),
+               Net_revenue = fin_results$Net_Revenue)
+dev.off()
 
-
-
-
-
-
-
-
-
+pdf("figures/paper/Unmanaged.pdf",height=15, width=15)
+get_revenue_dependence(Net_revenue = fin_results$Net_Revenue,
+                       streamflow = streamflow, 
+                       CDD = CDD,
+                       Market_Price = fin_results$Market_Price,
+                       NG_Price = Yearly_gas$V1)
 dev.off()
 
 
-
-
+pdf("figures/paper/Corr_Plot.pdf",height=15, width=15)
+get_corr_plot(Net_revenue = fin_results$Net_Revenue,
+              streamflow = streamflow,
+              CDD = CDD,
+              NG_Price = Yearly_gas$V1)
+dev.off()
 
 
