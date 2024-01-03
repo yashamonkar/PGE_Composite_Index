@@ -132,6 +132,7 @@ ggplot(plt_dataset) +
         legend.title = element_text(size = 8))
 
 
+quants <- quantile(plt_dataset$streamflow, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1))
 plt_dataset$discrete_streamflow <- cut(plt_dataset$streamflow, breaks = 4, labels = c("Low", "Medium", "High" , " Very High"))
 
 plt_dataset$SF_Quant <- rank(plt_dataset$streamflow)/nrow(plt_dataset)
@@ -247,31 +248,65 @@ ggplot(plt_dataset) +
 
 dev.off()
 
+pdf("figures/paper/Revenue_Correlation.pdf", 
+    height=7, width=8)
+
+ggplot(plt_dataset) +
+  geom_point(aes(y=Revenue, x=NG, 
+                 shape = factor(discrete_streamflow),
+                 col = CDD), size = 2) +
+  geom_point(data = high_cdd, 
+             mapping = aes(x=NG,y=Revenue), 
+             shape = 24, color = "blue", fill = NA, size = 5) +
+  geom_point(data = high_price, 
+             mapping = aes(x=NG,y=Revenue), 
+             shape = 21, color = "red", fill = NA, size = 7) +
+  scale_color_gradient2(midpoint=median(plt_dataset$CDD),
+                        low="blue", mid="green",high="red") +
+  geom_hline(yintercept = quantile(plt_dataset$Revenue, 0.20), 
+             col = "black", linetype ='dashed') +
+  scale_size(range = c(1, 3)) +
+  ylab("Net Revenue ($B)") +  
+  xlab("Natural Gas Price ($/Million Btu)") +
+  ggtitle("Net Revenue and influence of indices") +
+  guides(color = guide_colourbar(barwidth = rel(10), barheight = rel(1))) +
+  theme_bw() +
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
+        legend.position = "bottom",
+        legend.text = element_text(size = 10), 
+        legend.title = element_text(size = 12),
+        axis.text.x = element_text(size = rel(1.5)),  
+        axis.text.y = element_text(size = rel(1.5)),
+        axis.title.x = element_text(size = 14),  
+        axis.title.y = element_text(size = 14)) +
+  labs(shape = "Streamflow") 
+
+dev.off()
 
 #-------------Daily Time Scale-----------------------------#
 
-pdf("figures/Demand_Price_CDD_Diagnostics_Hourly.pdf")
+#pdf("figures/Demand_Price_CDD_Diagnostics_Hourly.pdf")
 
-plt_dataset <- data.frame(Demand = daily_demand,
-                          Price = daily_price)
+#plt_dataset <- data.frame(Demand = daily_demand,
+#                          Price = daily_price)
+#
 
-
-ggplot(plt_dataset) +
-  geom_point(mapping = aes(x=Demand, y=Price), alpha = 1/20) +
-  ggtitle("Price vs Demand") +
-  theme_bw()
-
-
-ggplot(plt_dataset) +
-  geom_point(mapping = aes(x=log(Demand), y=log(Price)), alpha = 1/20) +
-  ggtitle("Price vs Demand") +
-  theme_bw()
+#ggplot(plt_dataset) +
+#  geom_point(mapping = aes(x=Demand, y=Price), alpha = 1/20) +
+#  ggtitle("Price vs Demand") +
+#  theme_bw()
 
 
+#ggplot(plt_dataset) +
+#  geom_point(mapping = aes(x=log(Demand), y=log(Price)), alpha = 1/20) +
+#ggtitle("Price vs Demand") +
+#  theme_bw()
 
 
 
-dev.off()
+
+
+#dev.off()
 
 
 
