@@ -41,7 +41,7 @@ Load_profile <- read.csv("data/Load_Profile.csv", header = FALSE)
 #______________________________________________________________________________#
 ###Model Hyper-parameters###
 N_years <- 500
-avg_price_increase <- 5.22486 #$/Mwhr
+avg_price_increase <- 0 #5.22486 #$/Mwhr -- Removed
 
 
 #------------------------------------------------------------------------------#

@@ -15,7 +15,6 @@ library(dplyr)
 library(corrplot)
 
 
-
 #______________________________________________________________________________#
 ###Model Hyper-parameters###
 N_years <- 500
@@ -51,6 +50,7 @@ for(yr in 1:N_years) {
   reduced_gen <- no_tax_gen - tax_gen
   reduced_pollution <- reduced_gen * thermal_tax
   prevented_damages[[yr]] <- sum(reduced_pollution[,4])/10^6
+
   
 }
 
