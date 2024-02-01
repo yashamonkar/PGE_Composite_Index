@@ -26,12 +26,15 @@ get_revenue_comp <- function(tax, no_tax){
     geom_histogram(position = "identity", alpha = 0.35, bins = 30, color = 'black') +
     scale_fill_manual(values = c("Tax" = "red", "No Tax" = "grey")) +
     geom_vline(aes(xintercept = mean(plt_dataset$Revenue[Scenario == "Tax"])),
-               color = "red", linetype = "dashed", size = 1.5) +
+               color = "red", size = 1.5) +
     geom_vline(aes(xintercept = mean(plt_dataset$Revenue[Scenario == "No Tax"])),
+               color = "grey", size = 1.5) +
+    geom_vline(aes(xintercept = min(plt_dataset$Revenue[Scenario == "Tax"])),
+               color = "red", linetype = "dashed", size = 1.5) +
+    geom_vline(aes(xintercept = min(plt_dataset$Revenue[Scenario == "No Tax"])),
                color = "grey", linetype = "dashed", size = 1.5) +
-    annotation_custom(tableGrob(mydata, rows = NULL), 
-                      xmin=11.25, xmax=11.75, ymin=40, ymax=60) +
-    ggtitle("PG&E Annual Net Revenues ($B) \n under different scenarios") +
+    #annotation_custom(tableGrob(mydata, rows = NULL), 
+    #                  xmin=11.25, xmax=11.75, ymin=40, ymax=60) +
     labs(x = "Net Revenue ($B)", y = "Frequency") +
     theme_bw() +
     theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),

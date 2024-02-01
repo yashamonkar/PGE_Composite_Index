@@ -19,6 +19,7 @@ get_revenue_dependence <- function(Net_revenue, streamflow, CDD,
                             Market_Price = fin_results$Market_Price,
                             NG_Price = Yearly_gas$V1,
                             Net_revenue = fin_results$Net_Revenue)
+  plt_dataset <- plt_dataset[-which.min(plt_dataset$Net_revenue), ]
   
   #--------------------------All Years----------------------------------#
 
@@ -26,7 +27,6 @@ get_revenue_dependence <- function(Net_revenue, streamflow, CDD,
     geom_histogram(bins = 30, fill = "grey", color = "black") +
     xlab(" ") +  
     ylab("Count") +  
-    ggtitle("PG&E Annual Net Revenues ($B)") +
     geom_text(aes(x = 11.5, y = 60, label = "All Years"), size = 8) +
     xlim(c(11.2,13.15)) +
     geom_vline(xintercept = mean(plt_dataset$Net_revenue), 
@@ -94,7 +94,7 @@ get_revenue_dependence <- function(Net_revenue, streamflow, CDD,
     theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
           axis.text.y = element_text(size = rel(0)),
           axis.text.x = element_text(size = rel(3)),
-          axis.title.x = element_text(size = 20),  
+          axis.title.x = element_text(size = 24),  
           axis.title.y = element_text(size = 20))
   
   

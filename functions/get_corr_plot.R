@@ -5,7 +5,7 @@
 #4. Market Price #Market_Price = fin_results$Market_Price
 #5. Natural Gas Price #NG = Yearly_gas$V1
 
-get_corr_plot <- function(Net_revenue, streamflow, CDD, NG_Price){
+get_corr_plot <- function(Net_revenue, streamflow, CDD, NG_Price, Fitted_Values){
   
   
   #Library
@@ -15,9 +15,10 @@ get_corr_plot <- function(Net_revenue, streamflow, CDD, NG_Price){
   #Set up the data set. 
   plt_dataset <- data.frame(streamflow = streamflow, 
                             CDD = CDD,
-                            NG_Price = Yearly_gas$V1,
-                            Composite_Index = composite_index$fitted.values,
-                            Net_revenue = fin_results$Net_Revenue)
+                            NG_Price = NG_Price,
+                            Composite_Index = Fitted_Values,
+                            Net_revenue = Net_revenue)
+  #plt_dataset <- plt_dataset[-which.min(plt_dataset$Net_revenue), ]
   
   plt_dataset <- data.frame(scale(plt_dataset))
   

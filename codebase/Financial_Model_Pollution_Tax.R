@@ -17,6 +17,7 @@ library(corrplot)
 
 #Load Functions
 source("functions/get_revenue_comp.R")
+source("functions/get_corr_plot.R")
 
 pdf("figures/financial_model_pollution_tax.pdf")
 
@@ -556,12 +557,11 @@ pairs(plt_dataset, lower.panel = lower.panel,
 dev.off()
 
 
-
-#______________________________________________________________________________#
-#Final Plots for the paper
-no_tax_rev <- read.csv("sims/Net_Revenue_no_tax.csv", header = TRUE, sep=",")
-
-pdf("figures/paper/Revenue_Comparision.pdf",height=7, width=9)
-get_revenue_comp(tax = fin_results$Net_Revenue, 
-                 no_tax = no_tax_rev$Net_revenue)
+pdf("figures/supplement/Corr_Plot_Pollution_Tax.pdf",height=15, width=15)
+get_corr_plot(Net_revenue = reg_dataset$Net_revenue,
+              streamflow = streamflow,
+              CDD = CDD,
+              NG_Price = Yearly_gas$V1,
+              Fitted_Values = composite_index$fitted.values)
 dev.off()
+

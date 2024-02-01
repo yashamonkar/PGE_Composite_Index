@@ -13,6 +13,7 @@ pdf("figures/Demand_Price_CDD_Diagnostics_Annual.pdf")
 Demand <- read.csv("data/Simulated_Demand.csv", header = FALSE)
 Demand <- matrix(Demand$V1, nrow = 8760, ncol = 500)
 Demand <- as.data.frame(Demand)
+max_demand <- apply(Demand, 2, max)
 #Daily Steps
 daily_demand <- sapply(Demand, function(column) rollapply(column, width = 24, by = 24, FUN = mean, align = "left", partial = TRUE))
 daily_demand <- daily_demand[1:363,]
@@ -25,11 +26,28 @@ Demand <- NULL
 
 #Price Daata
 Price <- read.csv("data/no_tax/Simulated_Price_Variable_NG.csv", header = FALSE)
+max_price <- apply(Price, 2, max)
 daily_price <- sapply(Price, function(column) rollapply(column, width = 24, by = 24, FUN = mean, align = "left", partial = TRUE))
 daily_price <- as.numeric(unlist(daily_price))
 annual_price <- colMeans(Price)
+
+count_exceed <- list()
+for(i in 1:500){
+  count_exceed[[i]] <- sum(Price[,i] > 1000)
+}
+count_exceed <- unlist(count_exceed)
+
 Price <- NULL
 
+#Max Temperautre -- Daily
+Temp <- read.csv("data/temp_annual.csv")
+pge_cities = c('FRESNO_T', 'SACRAMENTO_T','SAN.JOSE_T', 'SAN.FRANCISCO_T')
+Temp = Temp[,pge_cities]
+Temp = data.frame(Temp = rowMeans(Temp),
+                  Year = rep(1:500, each = 365))
+Temp = Temp %>% group_by(Year) %>% summarize(max(Temp))
+max_temp = Temp$`max(Temp)`
+Temp = NULL
 
 #CDD
 CDD <- read.csv("data/CDD.csv")
@@ -56,13 +74,6 @@ Yearly_gas <- read.csv("data/Yearly_gas.csv", header = FALSE)
 
 
 #-------------Annual Time Scale-----------------------------#
-plt_dataset <- data.frame(Demand = yearly_demand, 
-                          streamflow = streamflow,
-                          CDD = CDD,
-                          Price = annual_price,
-                          NG = Yearly_gas$V1,
-                          Revenue = net_revenue$Net_revenue)
-
 # Customize Lower Panel
 lower.panel<-function(x, y){
   points(x,y, pch=19)
@@ -82,11 +93,23 @@ panel.hist = function(x, ...) {
   lines(density(x))
 }
 
+
+
+plt_dataset <- data.frame(Demand = yearly_demand, 
+                          streamflow = streamflow,
+                          CDD = CDD,
+                          Price = annual_price,
+                          NG = Yearly_gas$V1,
+                          Revenue = net_revenue$Net_revenue)
+
+
 pairs(plt_dataset, lower.panel = lower.panel, 
       upper.panel = NULL, diag.panel = panel.hist)
 
 
-
+#Add the count exceedances
+plt_dataset$Exceed <- count_exceed
+plt_dataset <- plt_dataset[-which.min(plt_dataset$Revenue), ]
 
 ggplot(plt_dataset) +
   geom_point(aes(x=Demand, y=CDD, col = Price)) +
@@ -176,6 +199,9 @@ top_values <- sort(plt_dataset$NG, decreasing = TRUE)[1:3]
 high_gas <- plt_dataset[plt_dataset$NG %in% top_values,]
 
 
+extreme_price <- plt_dataset[plt_dataset$Exceed > 0,]
+
+
 
 ggplot(plt_dataset) +
   geom_point(aes(y=Revenue, x=CDD, 
@@ -243,6 +269,56 @@ ggplot(plt_dataset) +
         legend.text = element_text(size = 6), 
         legend.title = element_text(size = 6))
 
+
+
+ggplot(plt_dataset) +
+  geom_point(aes(y=Revenue, x=NG, 
+                 shape = factor(discrete_streamflow),
+                 col = CDD)) +
+  geom_point(data = high_cdd, 
+             mapping = aes(x=NG,y=Revenue), 
+             shape = 24, color = "blue", fill = NA, size = 5) +
+  geom_point(data = high_price, 
+             mapping = aes(x=NG,y=Revenue), 
+             shape = 21, color = "red", fill = NA, size = 5) +
+  geom_point(data = extreme_price, 
+             mapping = aes(x=NG,y=Revenue), 
+             shape = 21, color = "black", fill = NA, size = 5) +
+  scale_color_gradient2(midpoint=median(plt_dataset$CDD),
+                        low="blue", mid="green",high="red") +
+  geom_hline(yintercept = quantile(plt_dataset$Revenue, 0.20), 
+             col = "black", linetype ='dashed') +
+  scale_size(range = c(1, 3)) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 6), 
+        legend.title = element_text(size = 6))
+
+
+ggplot(plt_dataset) +
+  geom_point(aes(y=Revenue, x=Price, 
+                 shape = factor(discrete_streamflow),
+                 col = CDD)) +
+  geom_point(data = high_cdd, 
+             mapping = aes(x=Price,y=Revenue), 
+             shape = 24, color = "blue", fill = NA, size = 5) +
+  geom_point(data = high_price, 
+             mapping = aes(x=Price,y=Revenue), 
+             shape = 21, color = "red", fill = NA, size = 5) +
+  geom_point(data = extreme_price, 
+             mapping = aes(x=Price,y=Revenue), 
+             shape = 21, color = "black", fill = NA, size = 5) +
+  scale_color_gradient2(midpoint=median(plt_dataset$CDD),
+                        low="blue", mid="green",high="red") +
+  geom_hline(yintercept = quantile(plt_dataset$Revenue, 0.20), 
+             col = "black", linetype ='dashed') +
+  scale_size(range = c(1, 3)) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 6), 
+        legend.title = element_text(size = 6))
+
+
 ggplot(plt_dataset) +
   geom_point(aes(y=Price, x=NG))
 
@@ -251,24 +327,33 @@ dev.off()
 pdf("figures/paper/Revenue_Correlation.pdf", 
     height=7, width=8)
 
+
+high_cdd$Labels <- c("B", "A", "C")
+high_price$Labels <- c("E", "D", "C")
+
 ggplot(plt_dataset) +
   geom_point(aes(y=Revenue, x=NG, 
                  shape = factor(discrete_streamflow),
                  col = CDD), size = 2) +
   geom_point(data = high_cdd, 
              mapping = aes(x=NG,y=Revenue), 
-             shape = 24, color = "blue", fill = NA, size = 5) +
+             shape = 24, color = "blue", fill = NA, size = 5) + 
+  geom_text(data = high_cdd, 
+            mapping = aes(x=NG,y=Revenue, label = Labels), 
+            nudge_y = 0.05, vjust = 0) +
   geom_point(data = high_price, 
              mapping = aes(x=NG,y=Revenue), 
              shape = 21, color = "red", fill = NA, size = 7) +
+  geom_text(data = high_price, 
+            mapping = aes(x=NG,y=Revenue, label = Labels), 
+            nudge_y = 0.05, vjust = 0) +
   scale_color_gradient2(midpoint=median(plt_dataset$CDD),
                         low="blue", mid="green",high="red") +
-  geom_hline(yintercept = quantile(plt_dataset$Revenue, 0.20), 
+  geom_hline(yintercept = quantile(plt_dataset$Revenue, 0.15), 
              col = "black", linetype ='dashed') +
   scale_size(range = c(1, 3)) +
   ylab("Net Revenue ($B)") +  
   xlab("Natural Gas Price ($/Million Btu)") +
-  ggtitle("Net Revenue and influence of indices") +
   guides(color = guide_colourbar(barwidth = rel(10), barheight = rel(1))) +
   theme_bw() +
   theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
@@ -283,30 +368,90 @@ ggplot(plt_dataset) +
 
 dev.off()
 
-#-------------Daily Time Scale-----------------------------#
-
-#pdf("figures/Demand_Price_CDD_Diagnostics_Hourly.pdf")
-
-#plt_dataset <- data.frame(Demand = daily_demand,
-#                          Price = daily_price)
-#
-
-#ggplot(plt_dataset) +
-#  geom_point(mapping = aes(x=Demand, y=Price), alpha = 1/20) +
-#  ggtitle("Price vs Demand") +
-#  theme_bw()
 
 
-#ggplot(plt_dataset) +
-#  geom_point(mapping = aes(x=log(Demand), y=log(Price)), alpha = 1/20) +
-#ggtitle("Price vs Demand") +
-#  theme_bw()
+#________________________________________________________________________#
+###Does not work
+
+
+#Creating the plot in ggplot2
+quant50 <- apply(Price, 1, function(x) quantile(x, probs = 0.5))
+quant90 <- apply(Price, 1, function(x) quantile(x, probs = 0.9))
+quant95 <- apply(Price, 1, function(x) quantile(x, probs = 0.95))
+quant99 <- apply(Price, 1, function(x) quantile(x, probs = 0.99))
+quantmax <- apply(Price, 1, max)
+
+st_date <- as.POSIXct("01-01-2019 00:00", format="%m-%d-%Y %H:%M")
+time_stamps <- seq(st_date, by = "hour", length.out = 8712)
 
 
 
 
+plt_dataset <- data.frame(DOY = rep(time_stamps, 5),
+                          Price = c(quant50, quant90, quant95, quant99, quantmax), 
+                          Type = rep(c("Median", "90th quantile", 
+                                       "95th quantile", "99th quantile", 
+                                       "max"), each = 8712))
+plt_dataset$Type <- factor(plt_dataset$Type, levels = c("Median", "90th quantile", "95th quantile", "99th quantile", "max"))
 
-#dev.off()
+
+ggplot(plt_dataset) +
+  geom_line(aes(x=DOY, y= log10(Price), color = Type)) +
+  scale_y_continuous(name = "Market Price ($/Mwhr)", limits = c(1.4,3.1), 
+                     labels =  function(x) signif(10^x, digits = 2)) +
+  scale_color_manual(values = c("Median" = "#0000FF", 
+                                "90th quantile" = "#660099", 
+                                "95th quantile" = "pink", 
+                                "99th quantile" = "#CC0033", 
+                                "max" = "#FF0000")) +
+  xlab("Day of the Year (Representative Year)") +
+  theme_bw() +
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
+        legend.position = "bottom",
+        legend.text = element_text(size = 12), 
+        legend.title = element_text(size = 14),
+        axis.text.x = element_text(size = rel(1.5)),  
+        axis.text.y = element_text(size = rel(1.5)),
+        axis.title.x = element_text(size = 14),  
+        axis.title.y = element_text(size = 14)) +
+  guides(color = guide_legend(title = "Type", 
+                              order = 1,
+                              override.aes = list(size = 3)))
+
+
+
+plt_dataset <- data.frame(DOY = rep(time_stamps, 6),
+                          Price = c(quant50, quant90, quant95, quant99, quantmax, Price[,101]), 
+                          Type = rep(c("Median", "90th quantile", 
+                                       "95th quantile", "99th quantile", 
+                                       "max", "Year-101"), each = 8712))
+plt_dataset$Type <- factor(plt_dataset$Type, levels = c("Median", "90th quantile", "95th quantile", "99th quantile", "max", "Year-101"))
+
+
+ggplot(plt_dataset) +
+  geom_line(aes(x=DOY, y= log10(Price), color = Type)) +
+  scale_y_continuous(name = "Market Price ($/Mwhr)", limits = c(1.4,3.1),
+                     labels =  function(x) signif(10^x, digits = 2)) +
+  scale_color_manual(values = c("Median" = "#0000FF", 
+                                "90th quantile" = "#660099", 
+                                "95th quantile" = "pink", 
+                                "99th quantile" = "#CC0033", 
+                                "max" = "#FF0000",
+                                "Year-101" = "black")) +
+  xlab("Day of the Year (Representative Year)") +
+  theme_bw() +
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
+        legend.position = "bottom",
+        legend.text = element_text(size = 12), 
+        legend.title = element_text(size = 14),
+        axis.text.x = element_text(size = rel(1.5)),  
+        axis.text.y = element_text(size = rel(1.5)),
+        axis.title.x = element_text(size = 14),  
+        axis.title.y = element_text(size = 14))
+
+
+
+
 
 
 

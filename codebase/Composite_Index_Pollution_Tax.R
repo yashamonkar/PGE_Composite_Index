@@ -26,13 +26,19 @@ library(gridExtra)
 library(cowplot)
 library(ggpattern)
 
+#Load the functions
+source("functions/get_corr_plot.R")
+
 
 #______________________________________________________________________#
 #Initial Data Wrangling
-net_revenue <- read.csv("sims/Net_Revenue_Pollution_tax.csv", header = TRUE, sep=",")
+net_revenue <- read.csv("sims/Net_Revenue_Pollution_tax.csv", 
+                        header = TRUE, sep=",")
 streamflow <- read.csv("data/Streamflow.csv")
 CDD <- read.csv("data/CDD.csv")
 Yearly_gas <- read.csv("data/Yearly_gas.csv", header = FALSE)
+Pollution_Damages <- read.csv("sims/Net_Revenue_Pollution_tax.csv", 
+                              header = TRUE, sep=",")
 
 
 #Streamflow
@@ -54,19 +60,19 @@ reg_dataset <- data.frame(streamflow = scale(log(streamflow)),
 reg_dataset <- reg_dataset[-which.min(reg_dataset$Net_revenue), ]
 
 
-#pdf("figures/Risk_mitigation_pollution_tax.pdf", height=3700/600, width=6500/600)
+pdf("figures/Risk_mitigation_pollution_tax.pdf", height=3700/600, width=6500/600)
 
 #______________________________________________________________________#
 #Divide into training and testing. 
 set.seed(1)
-train_frac <- 0.9
+train_frac <- 0.8
 
 #Seperate into Testing and Training Datasets
 train_years <- sample(1:nrow(reg_dataset), 
                       round(500*train_frac), 
                       replace = FALSE)
 train_dataset <- reg_dataset[train_years,]
-
+test_dataset <- reg_dataset[-train_years,]
 
 
 
@@ -465,9 +471,16 @@ print(paste0("The 5th percentile of Unmanaged net revenues is ", 1000*quantile(r
 print(paste0("The 5th percentile of portfolio index is ", 1000*quantile(hedged_net_revenues_portfolio, 0.05)))
 print(paste0("The 5th percentile  of composite index is ", 1000*quantile(Composite_index$hedged_revenue, 0.05)))
 
-#dev.off()
+dev.off()
 
 
 
 #______________________________________________________________________#
-###Additional Plots and Checks
+#Save the Datasets
+revenues <- data.frame(Unmanaged = reg_dataset$Net_revenue,
+                       Portfolio = hedged_net_revenues_portfolio,
+                       Composite_index = Composite_index$hedged_revenue)
+write.table(revenues, "sims/All_revenues_pollution_tax.csv", sep=",")
+
+
+

@@ -682,10 +682,10 @@ dev.off()
 
 
 pdf("figures/paper/Corr_Plot.pdf",height=15, width=15)
-get_corr_plot(Net_revenue = fin_results$Net_Revenue,
+get_corr_plot(Net_revenue = reg_dataset$Net_revenue,
               streamflow = streamflow,
               CDD = CDD,
-              NG_Price = Yearly_gas$V1)
+              NG_Price = Yearly_gas$V1,
+              Fitted_Values = composite_index$fitted.values)
 dev.off()
-
 

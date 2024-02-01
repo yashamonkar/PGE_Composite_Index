@@ -58,7 +58,7 @@ pdf("figures/Risk_mitigation_no_tax.pdf", height=3700/600, width=6500/600)
 #______________________________________________________________________#
 #Divide into training and testing. 
 set.seed(1)
-train_frac <- 0.9
+train_frac <- 0.8
 
 #Seperate into Testing and Training Datasets
 train_years <- sample(1:nrow(reg_dataset), 
@@ -160,6 +160,42 @@ points(test_dataset$Net_revenue, predict(reg_composite, newdata),
 abline(0,1, lty = 2)
 mtext(paste0("Training Correlation (R) is ", train_cor, ". The Adjusted R-sq is ", adj_r), 
       side=3)
+
+
+paste0("The mean training error is ", mean((train_dataset$Net_revenue-reg_composite$fitted.values)^2))
+paste0("The mean testing error is ", mean((test_dataset$Net_revenue-predict(reg_composite, newdata))^2))
+
+
+plt_dataset <- data.frame(Revenues = c(train_dataset$Net_revenue, test_dataset$Net_revenue),
+                          Fitted = c(reg_composite$fitted.values, predict(reg_composite, newdata)),
+                          Type = c(rep("Training",400), rep("Testing",99) ))
+
+pdf("figures/supplement/Testing_Training_Error.pdf", 
+    height=7, width=9)
+ggplot(plt_dataset) +
+  geom_point(aes(x=Revenues, y = Fitted, color = Type), size = 2) +
+  xlab("Net Revenues ($B)") +  
+  xlim(c(11.5,13)) +
+  ylim(c(11.5,13)) +
+  ylab("Fitted Values ($B)") +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +  
+  scale_color_manual(values = c("Testing" = "red", "Training" = "black")) +  # Setting manual colors
+  theme_bw() +
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
+        legend.position = "bottom",
+        legend.text = element_text(size = 14), 
+        legend.title = element_text(size = 14),
+        axis.text.x = element_text(size = rel(1.5)),  
+        axis.text.y = element_text(size = rel(1.5)),
+        axis.title.x = element_text(size = 14),  
+        axis.title.y = element_text(size = 14))
+dev.off()
+
+
+
+
+
+
 
 
 #_________________________________________________________________________#
@@ -453,6 +489,90 @@ legend("topleft", legend=c("Unmanaged", "Composite Index"),
        title="Net Revenue", text.font=4, bg='lightblue')
 
 
+#Ggpplot = Composite Index
+plt_dataset <- data.frame(Year = rep(1:nrow(reg_dataset),2),
+                          Revenue = c(reg_dataset$Net_revenue,Composite_index$hedged_revenue),
+                          Type = rep(c("Unmanaged Revenues", "Managed Revenues"), each=499))
+
+pdf("figures/paper/Composite_Revenues.pdf",height=8, width=12)
+ggplot(plt_dataset) +
+  geom_line(aes(x=Year, y=Revenue, color = Type), size = 1.15) +
+  geom_hline(yintercept = min(reg_dataset$Net_revenue), 
+             col = "#000000", linetype ='dashed', size = 1.05) +
+  geom_hline(yintercept = min(Composite_index$hedged_revenue), 
+             col = "#FF0000", linetype ='dashed', size = 1.05) +
+  scale_x_continuous(name = "Years", limits = c(70,170)) +
+  scale_y_continuous(name = "Net Revenue ($B)", limits = c(11.4,12.75)) +
+  geom_hline(yintercept = mean(reg_dataset$Net_revenue), 
+             col = "#000000", linetype ='dashed', size = 1) +
+  geom_hline(yintercept = mean(Composite_index$hedged_revenue), 
+             col = "#FF0000", linetype ='dashed', size = 1) +
+  geom_segment(aes(x = 75, y = min(reg_dataset$Net_revenue), 
+                   xend = 75, yend = min(Composite_index$hedged_revenue)),
+               arrow = arrow(length = unit(0.5, "cm")), 
+               color ='blue', size = 1.15) +
+  geom_segment(aes(x = 70, y = mean(reg_dataset$Net_revenue), 
+                   xend = 70, yend = mean(Composite_index$hedged_revenue)),
+               arrow = arrow(length = unit(0.15, "cm")), 
+               color ='blue', size = 1.15) +
+  scale_x_continuous(name = "Years", limits = c(70,170)) +
+  geom_text(aes(x = 85, y = 11.6, 
+                label = "Net Revenue \n Floor Improvement"), 
+            size = 5) +
+  geom_text(aes(x = 70, y = 12.32, label = "Mean"), size = 5) +
+  scale_color_manual(values = c("Unmanaged Revenues" = "#000000", 
+                                "Managed Revenues" = "#FF0000")) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 12), 
+        legend.title = element_text(size = 14),
+        axis.text.x = element_text(size = rel(1.75)),  
+        axis.text.y = element_text(size = rel(1.75)),
+        axis.title.x = element_text(size = 18),  
+        axis.title.y = element_text(size = 18))
+dev.off()
+
+
+
+pdf("figures/supplement/Composite_Revenues_all.pdf",height=8, width=12)
+ggplot(plt_dataset) +
+  geom_line(aes(x=Year, y=Revenue, color = Type)) +
+  geom_hline(yintercept = min(reg_dataset$Net_revenue), 
+             col = "#000000", linetype ='dashed', size = 1.05) +
+  geom_hline(yintercept = min(Composite_index$hedged_revenue), 
+             col = "#FF0000", linetype ='dashed', size = 1.05) +
+  scale_x_continuous(name = "Years") +
+  scale_y_continuous(name = "Net Revenue ($B)", limits = c(11.4,13)) +
+  geom_hline(yintercept = mean(reg_dataset$Net_revenue), 
+             col = "#000000", linetype ='dashed', size = 1) +
+  geom_hline(yintercept = mean(Composite_index$hedged_revenue), 
+             col = "#FF0000", linetype ='dashed', size = 1) +
+  geom_segment(aes(x = 5, y = min(reg_dataset$Net_revenue), 
+                   xend = 5, yend = min(Composite_index$hedged_revenue)),
+               arrow = arrow(length = unit(0.5, "cm")), 
+               color ='blue', size = 1.15) +
+  geom_segment(aes(x = 0, y = mean(reg_dataset$Net_revenue), 
+                   xend = 0, yend = mean(Composite_index$hedged_revenue)),
+               arrow = arrow(length = unit(0.15, "cm")), 
+               color ='blue', size = 1.15) +
+  scale_x_continuous(name = "Years") +
+  geom_text(aes(x = 30, y = 11.6, 
+                label = "Net Revenue \n Floor Improvement"), 
+            size = 5) +
+  geom_text(aes(x = 0, y = 12.32, label = "Mean"), size = 5) +
+  scale_color_manual(values = c("Unmanaged Revenues" = "#000000", 
+                                "Managed Revenues" = "#FF0000")) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 12), 
+        legend.title = element_text(size = 14),
+        axis.text.x = element_text(size = rel(1.75)),  
+        axis.text.y = element_text(size = rel(1.75)),
+        axis.title.x = element_text(size = 18),  
+        axis.title.y = element_text(size = 18))
+dev.off()
+
+
 #______________________________________________________________________#
 ###Additional Plots and Checks
 print(paste0("The Variance of Unmanaged net revenues is ", var(1000*reg_dataset$Net_revenue)))
@@ -476,6 +596,23 @@ basis_risk$Portfolio[basis_risk$Portfolio > 0] <- 1
 #Overpayments of the composite index
 table(basis_risk$Unhedhged, basis_risk$Composite)/sum(basis_risk$Composite)
 table(basis_risk$Unhedhged, basis_risk$Portfolio)/sum(basis_risk$Portfolio)
+
+
+#Save the Datasets
+revenues <- data.frame(Unmanaged = reg_dataset$Net_revenue,
+                       Portfolio = hedged_net_revenues_portfolio,
+                       Composite_index = Composite_index$hedged_revenue)
+write.table(revenues, "sims/All_revenues_no_tax.csv", sep=",")
+
+Unmanaged_Losses <- quantile(reg_dataset$Net_revenue, Composite_index$strike) - reg_dataset$Net_revenue
+Unmanaged_Losses[Unmanaged_Losses < 0] = 0
+payouts <- data.frame(Unmanaged = Unmanaged_Losses,
+                      Portfolio = payout_portfolio,
+                      Composite_index = Composite_index$Payout,
+                      Streamflow = sf_index$Payout,
+                      CDD = cdd_index$Payout,
+                      NG = NG_index$Payout)
+write.table(payouts, "sims/All_payouts_no_tax.csv", sep=",")
 
 
 #----------------------------------------------------------------------#
@@ -505,10 +642,14 @@ par(mfrow=c(1,1))
 
 
 #----------------------------------------------------------------------#
-plt_dataset <- data.frame(Revenue = c(reg_dataset$Net_revenue, 
-                                      hedged_net_revenues_portfolio),
-                          Type = c(rep("Unmanaged", nrow(reg_dataset)),
-                                   rep("Portfolio", nrow(reg_dataset))))
+Net_Revenue <- reg_dataset$Net_revenue
+Hedged_Revenue <- hedged_net_revenues_portfolio
+Composite_Revene <- Composite_index$hedged_revenue
+
+
+plt_dataset <- data.frame(Revenue = c(Net_Revenue, Hedged_Revenue),
+                          Type = c(rep("Unmanaged", length(Net_Revenue)),
+                                   rep("Portfolio", length(Hedged_Revenue))))
 
 p1 <- ggplot(plt_dataset, aes(x=Revenue, fill = Type, pattern = Type)) +
   geom_histogram_pattern(
@@ -530,11 +671,16 @@ p1 <- ggplot(plt_dataset, aes(x=Revenue, fill = Type, pattern = Type)) +
   xlab("Revenue ($B)") +
   ylab("Count (No. of Years)") +
   scale_pattern_manual(values = c(Portfolio = "stripe", Unmanaged = "none")) +
-  ggtitle(paste0("Portfolio of Contracts \nCost - Annual Premium - ", 1000*round(premium_portfolio, 3), "$ Million")) +
-  xlim(c(min(reg_dataset$Net_revenue),max(reg_dataset$Net_revenue))) +
+  #ggtitle(paste0("Portfolio of Contracts \nCost - Annual Premium - ", 1000*round(premium_portfolio, 3), "$ Million")) +
+  xlim(c(min(Net_Revenue),max(Net_Revenue))) +
   theme_bw() +
   theme(legend.position = "bottom",
-        plot.title = element_text(size=20)) 
+        legend.text = element_text(size = 15), 
+        legend.title = element_text(size = 14),
+        axis.text.x = element_text(size = rel(1.75)),  
+        axis.text.y = element_text(size = rel(1.75)),
+        axis.title.x = element_text(size = 18),  
+        axis.title.y = element_text(size = 18))
 
 
 
@@ -567,73 +713,32 @@ p2 <- ggplot(plt_dataset, aes(x=Revenue, fill = Type, pattern = Type)) +
   scale_pattern_manual(values = c(Composite_Index = "wave", Unmanaged = "none")) +
   xlab("Revenue ($B)") +
   ylab("Count (No. of Years)") +
-  ggtitle(paste0("Composite Index Contract \nCost - Annual Premium - ", 1000*round(Composite_index$premium, 3), "$ Million")) +
-  xlim(c(min(reg_dataset$Net_revenue),max(reg_dataset$Net_revenue))) +
+  #ggtitle(paste0("Composite Index Contract \nCost - Annual Premium - ", 1000*round(Composite_index$premium, 3), "$ Million")) +
+  xlim(c(min(Net_Revenue),max(Net_Revenue))) +
   theme_bw() +
   theme(legend.position = "bottom",
-        plot.title = element_text(size=20)) 
+        legend.text = element_text(size = 15), 
+        legend.title = element_text(size = 14),
+        axis.text.x = element_text(size = rel(1.75)),  
+        axis.text.y = element_text(size = rel(1.75)),
+        axis.title.x = element_text(size = 18),  
+        axis.title.y = element_text(size = 18))
 
-
-plot_grid(p1,p2,
-          nrow =1)
+pdf("figures/paper/Histogram_Revenues.pdf",height=7, width=14)
+plot_grid(p2,p1,
+          nrow =1,
+          labels = c('A', 'B'), 
+          label_size = 22)
+dev.off()
 
 
 #------------------------------------------------------------------------------------------#
-# Figure 10 --> Add the boxplots for both 
+#Histograms of Payouts 
 
 #Unmanaged Losses
 Unmanaged_Losses <- quantile(reg_dataset$Net_revenue, Composite_index$strike) - reg_dataset$Net_revenue
-Unmanaged_Losses[Unmanaged_Losses < 0] = 0
+Unmanaged_Losses[Unmanaged_Losses < 0] = 0 
 
-
-plt_dataset <- data.frame(Unmanaged_Loss = -Unmanaged_Losses*1000,
-                          Composite = Composite_index$Payout*1000,
-                          Streamflow = sf_index$Payout*1000,
-                          CDD = cdd_index$Payout*1000,
-                          Natural_Gas = NG_index$Payout*1000)
-plt_dataset <- t(plt_dataset)
-
-
-
-#ns <- sample(1:470, 1) #ns <- 108, 392 106,316 #55,321, 58, 393, 322
-#plt_dataset <- plt_dataset[,ns:(ns+20)]
-#colnames(plt_dataset) <- c(1:21)
-
-ns <- c( 222,  21, 209, 188, 401, 261,  213, 296, 109, 497, 225, 263, 155, 176,  17, 290, 285, 80, 436,   172) #sample(1:ncol(plt_dataset), 20)
-plt_dataset <- plt_dataset[,ns]
-colnames(plt_dataset) <- c(1:20)
-
-
-plt2 <- plt_dataset[2:5,]
-
-x <- 1:100
-y <- rep(plt_dataset[1,], each = 5)
-
-
-
-par(mfrow = c(1,1),  mar = c(5, 5, 3, 2))
-
-barplot(plt2,
-        col = c("#0096FF", "#DCDCDC", "#808080", "#B2BEB5"),
-        beside = TRUE,
-        ylim = c(-350, 350), border = TRUE,
-        ylab = "($ Million)", 
-        xlab = "Years", cex.lab=1.5, cex.legend = 1.75)
-lines(x,y, lwd = 3, lty = 2 , col ='red')
-for(i in 1:20){
-  lines(x= c(0.5+5*i, 0.5+5*i), y=c(0,280), lwd = 0.05, lty =2)}
-legend('topright', 
-       legend  = c("Unmanaged Loss",  "Composite Payout", "Streamflow Payout", "Temperature Payout", "Natural Gas Payout"),
-       col = c("red","#0096FF", "#DCDCDC", "#808080", "#B2BEB5"),
-       pch = 15, cex = 0.9, ncol=5, 
-       pt.cex=c(0,2.5,2.5,2.5,2.5,2.5),
-       lwd=c(2,NA,NA,NA,NA,NA),
-       lty=c(2,NA,NA,NA,NA,NA))
-
-
-
-#------------------------------------------------------------------------------------------#
-# Figure 11 --> Add the boxplots for both 
 
 plt_dataset <- data.frame(Revenue = c(Unmanaged_Losses, 
                                       payout_portfolio),
@@ -651,11 +756,11 @@ p1 <- ggplot(plt_dataset, aes(x=Revenue, fill = Type, pattern = Type)) +
     alpha = 0.5, bins=30) +
   scale_fill_manual(values = c("#FFFFFF", "#E69F00")) +
   scale_pattern_manual(values = c(Portfolio = "stripe", Unmanaged = "none")) +
-  ggtitle(paste0("Portfolio of Contracts - Payouts \nAnnual Premium - ", 1000*round(premium_portfolio, 3), "$ Million")) +
   xlim(c(-0.1,0.35)) +
-  ylim(c(0,500)) +
+  scale_y_log(name = "Count (No. of Years)", 
+                breaks=c(5, 10, 50, 100, 200, 300, 400, 500),
+                limits = c(1,499)) +
   xlab("Revenue ($B)") +
-  ylab("Count (No. of Years)") +
   theme_bw() +
   theme(legend.position = "bottom",
         plot.title = element_text(size=20)) 
@@ -748,5 +853,88 @@ p2 <- ggplot(plt_dataset, aes(x=Revenue, fill = Type, pattern = Type)) +
 
 plot_grid(p1,p2,
           nrow =1)
+
+
+#------------------------------------------------------------------------------------------#
+# Figure 10 --> Add the boxplots for both 
+
+#Unmanaged Losses
+Unmanaged_Losses <- quantile(reg_dataset$Net_revenue, Composite_index$strike) - reg_dataset$Net_revenue
+Unmanaged_Losses[Unmanaged_Losses < 0] = 0
+
+
+plt_dataset <- data.frame(Unmanaged_Loss = -Unmanaged_Losses*1000,
+                          Composite = Composite_index$Payout*1000,
+                          Streamflow = sf_index$Payout*1000,
+                          CDD = cdd_index$Payout*1000,
+                          Natural_Gas = NG_index$Payout*1000)
+plt_dataset <- t(plt_dataset)
+
+
+
+#ns <- sample(1:470, 1) #ns <- 108, 392 106,316 #55,321, 58, 393, 322
+#plt_dataset <- plt_dataset[,ns:(ns+20)]
+#colnames(plt_dataset) <- c(1:21)
+
+ns <- c( 222,  21, 209, 188, 401, 261,  213, 296, 109, 497, 225, 263, 155, 176,  17, 290, 285, 80, 436,   172) #sample(1:ncol(plt_dataset), 20)
+plt_dataset <- plt_dataset[,ns]
+colnames(plt_dataset) <- c(1:20)
+
+
+# Example of how your data should be structured:
+data <- data.frame(
+  Year = rep(1:20, times = 5),
+  Type = rep(c("Unmanaged Loss", "Composite Payout", "Streamflow Payout", "CDD Payout", "Natural Gas Payout"), each = 20),
+  Value = c(plt_dataset[1,], plt_dataset[2,], plt_dataset[3,], plt_dataset[4,], plt_dataset[5,]) # This should be your actual data values
+)
+
+
+data$Type <- factor(data$Type, 
+                    levels = c("Composite Payout", "Streamflow Payout", "CDD Payout", "Natural Gas Payout", "Unmanaged Loss"))
+
+
+p <- ggplot(data, aes(x = Year, y = Value, fill = Type, color = Type)) +
+  geom_bar(data = subset(data, Type != "Unmanaged Loss"), stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("Composite Payout" = "orange", 
+                               "Streamflow Payout" = "grey", 
+                               "CDD Payout" = "grey80", 
+                               "Natural Gas Payout" = "grey50")) +
+  scale_color_manual(values = c("Unmanaged Loss" = "blue")) +
+  labs(fill = "", color = "", x = "Years", y = "($ Million)") +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 15), 
+        legend.title = element_blank(),
+        axis.text.x = element_text(size = rel(1.75)),  
+        axis.text.y = element_text(size = rel(1.75)),
+        axis.title.x = element_text(size = 18),  
+        axis.title.y = element_text(size = 18))
+
+
+
+legend_b <- get_legend(
+  p + 
+    guides(color = guide_legend(nrow = 1, override.aes = list(size=2))) +
+    theme(legend.position = "bottom")
+)
+
+
+p <- p + 
+  geom_line(data = subset(data, Type == "Unmanaged Loss"), 
+            size = 1, linetype = "dashed", color = 'blue') +
+  geom_point(data = subset(data, Type == "Unmanaged Loss"), 
+             size = 2.5, color = 'blue')
+
+for(i in 1:21){
+  p <- p +  geom_segment(x = i-0.5, y = 0, xend = i-0.5, yend = 250, color = "black", linetype = 'dashed')
+}
+
+p <- p + theme(legend.position="none")
+
+
+pdf("figures/paper/Payouts.pdf",height=7, width=14)
+plot_grid(p, legend_b, ncol = 1, rel_heights = c(1, .2))
+dev.off()
+
 
 dev.off()

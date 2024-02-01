@@ -18,13 +18,12 @@ get_validation <- function(Deliveries,Net_revenue){
     geom_point(aes(x = 83017, y = 10), color = "red", size = 5) +
     xlab("Annual Energy Deliveries (GWhr)") +  
     ylab("Frequency/Count") +  
-    ggtitle("Annual PG&E Energy Deliveries") +
     theme_bw() +
     theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
           axis.text.y = element_text(size = rel(1.5)),
           axis.text.x = element_text(size = rel(1.5)),
-          axis.title.x = element_text(size = 14),  
-          axis.title.y = element_text(size = 14))
+          axis.title.x = element_text(size = 16),  
+          axis.title.y = element_text(size = 16))
   
   
   #--------Plot for Net Revenue-----------------#
@@ -37,17 +36,16 @@ get_validation <- function(Deliveries,Net_revenue){
     geom_point(aes(x = 12.3, y = 10), color = "red", size = 5) +
     xlab("Net Revenues ($B)") +  
     ylab("Frequency/Count") +  
-    ggtitle("PG&E Annual Net Revenues ($B)") +
     theme_bw() +
     theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
           axis.text.y = element_text(size = rel(1.5)),
           axis.text.x = element_text(size = rel(1.5)),
-          axis.title.x = element_text(size = 14),  
-          axis.title.y = element_text(size = 14))
+          axis.title.x = element_text(size = 16),  
+          axis.title.y = element_text(size = 16))
   
   plot_grid(p1,p2,
             nrow =1,
-            labels = c('a', 'b'), 
+            labels = c('A', 'B'), 
             label_size = 18)
   
  
