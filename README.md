@@ -1,7 +1,13 @@
 # PGE_Composite_Index
-A composite index-based instrument for managing the financial risk of variable hydrometerology for electric utilities.
-This manuscript is currently under peer-review. 
-An open-source archived version of this study can be found here - 
+
+
+
+This is the code repository for the paper "A composite index-based instrument for managing the financial risk of variable hydrometerology for electric utilities".
+This work is currently under peer review  (https://www.cell.com/patterns/home). 
+# The document can be found here - https://doi.org/10.1016/j.patter.2022.100454
+
+All code to replicate the work done in the paper along with the supplementery materials is archived here. The scripts in the /codebase, when run, replicate the entire study along with additional cases and plots for an extensive analysis. Most individual sub-routines are stored as functions in /functions.
+
 
 
 **Abstract**
