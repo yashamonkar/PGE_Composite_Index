@@ -325,7 +325,7 @@ ggplot(plt_dataset) +
 dev.off()
 
 pdf("figures/paper/Revenue_Correlation.pdf", 
-    height=7, width=8)
+    height=7, width=10)
 
 
 high_cdd$Labels <- c("B", "A", "C")
@@ -354,14 +354,16 @@ ggplot(plt_dataset) +
   scale_size(range = c(1, 3)) +
   ylab("Net Revenue ($B)") +  
   xlab("Natural Gas Price ($/Million Btu)") +
-  guides(color = guide_colourbar(barwidth = rel(10), barheight = rel(1))) +
+  guides(color = guide_colourbar(barwidth = rel(1), barheight = rel(8))) +
   theme_bw() +
   theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
-        legend.position = "bottom",
-        legend.text = element_text(size = 10), 
-        legend.title = element_text(size = 12),
-        axis.text.x = element_text(size = rel(1.5)),  
-        axis.text.y = element_text(size = rel(1.5)),
+        legend.position = c(0.01, 0.01),
+        legend.justification = c(0.01, 0.01),
+        legend.box.just = "bottom",
+        legend.text = element_text(size = 12), 
+        legend.title = element_text(size = 14),
+        axis.text.x = element_text(size = rel(1.75)),  
+        axis.text.y = element_text(size = rel(1.75)),
         axis.title.x = element_text(size = 14),  
         axis.title.y = element_text(size = 14)) +
   labs(shape = "Streamflow") 

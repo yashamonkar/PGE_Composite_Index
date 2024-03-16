@@ -162,15 +162,17 @@ ggplot(plt_dataset) +
   ylim(c(600,750))+
   theme_bw() +
   theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
-        legend.position = "bottom",
+        legend.position = c(0.99, 0.99),
+        legend.justification = c(0.99, 0.99),
+        legend.box.just = "bottom",
         legend.text = element_text(size = 10), 
         legend.title = element_text(size = 12),
-        axis.text.x = element_text(size = rel(1.5)),  
-        axis.text.y = element_text(size = rel(1.5)),
+        axis.text.x = element_text(size = rel(1.75)),  
+        axis.text.y = element_text(size = rel(1.75)),
         axis.title.x = element_text(size = 14),  
         axis.title.y = element_text(size = 14)) +
   guides(color = guide_colourbar(title.hjust = 0.5,
-                                 barwidth = unit(4, "in"), barheight = unit(0.3, "in")))
+                                 barwidth = unit(0.3, "in"), barheight = unit(4, "in")))
 
   
 dev.off()

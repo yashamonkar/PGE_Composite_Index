@@ -71,7 +71,7 @@ bin_width = bins[1] - bins[0]
 width = bin_width
 
 axs[0,0].hist(payouts['Composite_index'], alpha=1.0, bins=np.arange(min(payouts['Composite_index']), max(payouts['Composite_index']) + width, width),color='darkorange',label='Composite Payout',linestyle='dashed', linewidth=2, edgecolor='k', hatch='///',histtype='step')
-axs[0,0].tick_params(labelsize=14)
+axs[0,0].tick_params(labelsize=16)
 axs[0,0].set_ylim(300, 500)
 axs[0,0].spines['bottom'].set_visible(False)
 axs[0,0].xaxis.tick_top()
@@ -86,7 +86,7 @@ axs[1,0].hist(payouts['Unmanaged'], bins=20, color='tab:blue')
 axs[1,0].hist(payouts['Composite_index'], alpha=1.0, bins=np.arange(min(payouts['Composite_index']), max(payouts['Composite_index']) + width, width),color='darkorange',linestyle='dashed', linewidth=2, edgecolor='k', hatch='///',histtype='step')
 # axs[1,0].set_ylim(0, 625)
 axs[1,0].set_ylim(0, 100)
-axs[1,0].tick_params(labelsize=14)
+axs[1,0].tick_params(labelsize=16)
 
 axs[1,0].spines['top'].set_visible(False)
 
@@ -102,13 +102,13 @@ axs[1,0].plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
 n, bins, _ = axs[0, 1].hist(payouts['Unmanaged'], bins=20)
 bin_width = bins[1] - bins[0]
 width = bin_width
-axs[0,1].tick_params(labelsize=14)
+axs[0,1].tick_params(labelsize=16)
 axs[0,1].hist(payouts['Portfolio'], alpha=1.0, bins=np.arange(min(payouts['Portfolio']), max(payouts['Portfolio']) + width, width),color='brown',label='Portfolio Payout', linestyle='dashed', linewidth=2, edgecolor='k',hatch='...',histtype='step')
 axs[1,1].hist(payouts['Unmanaged'], bins=20)
 axs[1,1].hist(payouts['Portfolio'], alpha=1.0,bins=np.arange(min(payouts['Portfolio']),max(payouts['Portfolio']) + width, width), color='brown', linestyle='dashed', linewidth=2, edgecolor='k',hatch='...',histtype='step')
 # axs[1,1].set_ylim(0, 625)
 axs[1, 1].set_ylim(0, 100)
-axs[1,1].tick_params(labelsize=14)
+axs[1,1].tick_params(labelsize=16)
 # axs[0,1].set_ylim(800,825)
 axs[0,1].set_ylim(300, 500)
 # hide the spines between ax and ax2
@@ -129,11 +129,23 @@ axs[1,1].plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
 
 lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
 lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
-axs[0,1].legend(lines, labels,prop={'size': 14},loc='upper right')
+axs[0,1].legend(lines, labels,prop={'size': 18},loc='upper right')
 
 #Add Labels
-axs[0,0].text(-0.1, 1.1, 'A', transform=axs[0,0].transAxes, size=20, weight='bold')
-axs[0,1].text(-0.1, 1.1, 'B', transform=axs[0,1].transAxes, size=20, weight='bold')
+axs[0,0].text(0.05, 0.9, 'A', transform=axs[0,0].transAxes, size=24, weight='bold')
+axs[0,1].text(0.05, 0.9, 'B', transform=axs[0,1].transAxes, size=24, weight='bold')
+
+
+axs[1,1].annotate('Overpayments', 
+                  xy=(0.1, 20), xycoords='data',
+                  xytext=(0.2, 100), textcoords='data',
+                  arrowprops=dict(arrowstyle="->", linewidth=2,
+                                  connectionstyle="arc3"),
+                  fontsize=18, 
+                  bbox=dict(boxstyle="round,pad=0.3", edgecolor='black', facecolor='white'))
+
+# Ensure that the added annotation does not cut off
+#plt.tight_layout()
 
 plt.tight_layout()
 #plt.savefig('Plots/Losses.png' , bbox_inches='tight',dpi=250)
@@ -143,7 +155,7 @@ plt.show()
 
 
 #%%
-#Histograms of Payouts -- Just Portfolio and Composite -- All years
+#Time Series -- Just Portfolio and Composite -- All years
 
 actual_loss_array = payouts['Unmanaged']
 yearly_payouts = payouts['Composite_index']
@@ -194,7 +206,7 @@ plt.show()
 
 
 #%%
-#Histograms of Payouts
+#Time Series of Payouts
 
 actual_loss_array = payouts['Unmanaged']
 yearly_payouts = payouts['Composite_index']

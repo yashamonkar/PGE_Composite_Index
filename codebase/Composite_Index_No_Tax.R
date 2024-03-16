@@ -523,8 +523,8 @@ ggplot(plt_dataset) +
   scale_color_manual(values = c("Unmanaged Revenues" = "#000000", 
                                 "Managed Revenues" = "#FF0000")) +
   theme_bw() +
-  theme(legend.position = "bottom",
-        legend.text = element_text(size = 12), 
+  theme(legend.position = c(0.85, 0.08),
+        legend.text = element_text(size = 14), 
         legend.title = element_text(size = 14),
         axis.text.x = element_text(size = rel(1.75)),  
         axis.text.y = element_text(size = rel(1.75)),
@@ -876,7 +876,8 @@ plt_dataset <- t(plt_dataset)
 #plt_dataset <- plt_dataset[,ns:(ns+20)]
 #colnames(plt_dataset) <- c(1:21)
 
-ns <- c( 222,  21, 209, 188, 401, 261,  213, 296, 109, 497, 225, 263, 155, 176,  17, 290, 285, 80, 436,   172) #sample(1:ncol(plt_dataset), 20)
+ns <- c( 222,  21, 80, 188, 401, 261,  213, 296, 109, 497, 225, 263, 155, 176,  17, 290, 285, 209, 436, 172) #sample(1:ncol(plt_dataset), 20)
+#ns <- c( 222,  21, 80, 188, 401, 261,  213, 296, 109, 497, 225, 445, 155, 176,  17, 56, 473, 209, 120, 436) #sample(1:ncol(plt_dataset), 20)
 plt_dataset <- plt_dataset[,ns]
 colnames(plt_dataset) <- c(1:20)
 
@@ -884,38 +885,38 @@ colnames(plt_dataset) <- c(1:20)
 # Example of how your data should be structured:
 data <- data.frame(
   Year = rep(1:20, times = 5),
-  Type = rep(c("Unmanaged Loss", "Composite Payout", "Streamflow Payout", "CDD Payout", "Natural Gas Payout"), each = 20),
+  Type = rep(c("Unmanaged Loss", "Composite Index Payout", "Streamflow Payout", "CDD Payout", "Natural Gas Payout"), each = 20),
   Value = c(plt_dataset[1,], plt_dataset[2,], plt_dataset[3,], plt_dataset[4,], plt_dataset[5,]) # This should be your actual data values
 )
 
 
 data$Type <- factor(data$Type, 
-                    levels = c("Composite Payout", "Streamflow Payout", "CDD Payout", "Natural Gas Payout", "Unmanaged Loss"))
+                    levels = c("Composite Index Payout", "Streamflow Payout", "CDD Payout", "Natural Gas Payout", "Unmanaged Loss"))
 
 
 p <- ggplot(data, aes(x = Year, y = Value, fill = Type, color = Type)) +
   geom_bar(data = subset(data, Type != "Unmanaged Loss"), stat = "identity", position = "dodge") +
-  scale_fill_manual(values = c("Composite Payout" = "orange", 
-                               "Streamflow Payout" = "grey", 
-                               "CDD Payout" = "grey80", 
-                               "Natural Gas Payout" = "grey50")) +
+  scale_fill_manual(values = c("Composite Index Payout" = "orange", 
+                               "Streamflow Payout" = "brown", 
+                               "CDD Payout" = "green", 
+                               "Natural Gas Payout" = "black")) +
   scale_color_manual(values = c("Unmanaged Loss" = "blue")) +
   labs(fill = "", color = "", x = "Years", y = "($ Million)") +
+  ylim(c(-300,300)) +
   theme_bw() +
-  theme(legend.position = "bottom",
-        legend.text = element_text(size = 15), 
+  theme(legend.text = element_text(size = 22), 
         legend.title = element_blank(),
         axis.text.x = element_text(size = rel(1.75)),  
         axis.text.y = element_text(size = rel(1.75)),
         axis.title.x = element_text(size = 18),  
-        axis.title.y = element_text(size = 18))
+        axis.title.y = element_text(size = 18)) 
 
 
 
 legend_b <- get_legend(
   p + 
-    guides(color = guide_legend(nrow = 1, override.aes = list(size=2))) +
-    theme(legend.position = "bottom")
+    guides(color = guide_legend(nrow = 4, override.aes = list(size=7)),
+           shape = guide_legend(override.aes = list(size = 5)))
 )
 
 
@@ -926,14 +927,14 @@ p <- p +
              size = 2.5, color = 'blue')
 
 for(i in 1:21){
-  p <- p +  geom_segment(x = i-0.5, y = 0, xend = i-0.5, yend = 250, color = "black", linetype = 'dashed')
+  p <- p +  geom_segment(x = i-0.5, y = 0, xend = i-0.5, yend = 300, color = "black", linetype = 'dashed')
 }
 
 p <- p + theme(legend.position="none")
 
 
 pdf("figures/paper/Payouts.pdf",height=7, width=14)
-plot_grid(p, legend_b, ncol = 1, rel_heights = c(1, .2))
+p + inset_element(legend_b, left = 0.05, bottom = 0.05, right = 0.25, top = 0.25)
 dev.off()
 
 

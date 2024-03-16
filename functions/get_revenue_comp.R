@@ -33,12 +33,10 @@ get_revenue_comp <- function(tax, no_tax){
                color = "red", linetype = "dashed", size = 1.5) +
     geom_vline(aes(xintercept = min(plt_dataset$Revenue[Scenario == "No Tax"])),
                color = "grey", linetype = "dashed", size = 1.5) +
-    #annotation_custom(tableGrob(mydata, rows = NULL), 
-    #                  xmin=11.25, xmax=11.75, ymin=40, ymax=60) +
     labs(x = "Net Revenue ($B)", y = "Frequency") +
     theme_bw() +
     theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
-          legend.position = "bottom",
+          legend.position = c(0.9, 0.9),
           legend.text = element_text(size = 14), 
           legend.title = element_text(size = 16),
           axis.text.x = element_text(size = rel(1.5)),  

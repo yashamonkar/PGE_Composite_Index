@@ -68,7 +68,7 @@ plt_dataset <- data.frame(Damages = Pollution_Damages$CAISO[-101],
                           Index = composite_index_revenue_tax$Composite_index)
 
 p1 <- ggplot(plt_dataset) +
-  geom_point(aes(x=Damages, y = Unmanaged), color='blue') +
+  geom_point(aes(x=Damages, y = Unmanaged), color='blue', size = 1.35) +
   geom_hline(aes(yintercept = mean(plt_dataset$Unmanaged)), size = 1.15) +
   geom_hline(aes(yintercept = quantile(plt_dataset$Unmanaged, 0.05)), 
              linetype = "dashed", size = 1.15) +
@@ -78,14 +78,14 @@ p1 <- ggplot(plt_dataset) +
   ylab("Net Revenue ($ Billion)") +
   ylim(c(11,12.7)) +
   theme_bw() +
-  theme(axis.text.x = element_text(size = rel(1.5)),  
-        axis.text.y = element_text(size = rel(1.5)),
-        axis.title.x = element_text(size = 14),  
-        axis.title.y = element_text(size = 14))
+  theme(axis.text.x = element_text(size = rel(2)),  
+        axis.text.y = element_text(size = rel(2)),
+        axis.title.x = element_text(size = 18),  
+        axis.title.y = element_text(size = 18))
 
 
 p2 <- ggplot(plt_dataset) +
-  geom_point(aes(x=Damages, y = Index), color='red') +
+  geom_point(aes(x=Damages, y = Index), color='red', size = 1.35) +
   geom_hline(aes(yintercept = mean(plt_dataset$Index)), size = 1.15) +
   geom_hline(aes(yintercept = quantile(plt_dataset$Index, 0.05)), 
              linetype = "dashed", size = 1.15) +
@@ -95,10 +95,10 @@ p2 <- ggplot(plt_dataset) +
   ylab("Net Revenue ($ Billion)") +
   ylim(c(11,12.7)) +
   theme_bw() +
-  theme(axis.text.x = element_text(size = rel(1.5)),  
-        axis.text.y = element_text(size = rel(1.5)),
-        axis.title.x = element_text(size = 14),  
-        axis.title.y = element_text(size = 14))
+  theme(axis.text.x = element_text(size = rel(2)),  
+        axis.text.y = element_text(size = rel(2)),
+        axis.title.x = element_text(size = 18),  
+        axis.title.y = element_text(size = 18))
 
 pdf("figures/paper/Pollution_Tax.pdf",height=7, width=18)
 plot_grid(p1,p2,

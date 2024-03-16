@@ -16,12 +16,12 @@ get_validation <- function(Deliveries,Net_revenue){
     geom_point(aes(x = 79774, y = 10), color = "red", size = 5) +
     geom_point(aes(x = 82226, y = 10), color = "red", size = 5) +
     geom_point(aes(x = 83017, y = 10), color = "red", size = 5) +
-    xlab("Annual Energy Deliveries (GWhr)") +  
+    xlab("Annual Energy Deliveries (GWh)") +  
     ylab("Frequency/Count") +  
     theme_bw() +
     theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
-          axis.text.y = element_text(size = rel(1.5)),
-          axis.text.x = element_text(size = rel(1.5)),
+          axis.text.y = element_text(size = rel(1.75)),
+          axis.text.x = element_text(size = rel(1.75)),
           axis.title.x = element_text(size = 16),  
           axis.title.y = element_text(size = 16))
   
@@ -38,8 +38,8 @@ get_validation <- function(Deliveries,Net_revenue){
     ylab("Frequency/Count") +  
     theme_bw() +
     theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
-          axis.text.y = element_text(size = rel(1.5)),
-          axis.text.x = element_text(size = rel(1.5)),
+          axis.text.y = element_text(size = rel(1.75)),
+          axis.text.x = element_text(size = rel(1.75)),
           axis.title.x = element_text(size = 16),  
           axis.title.y = element_text(size = 16))
   
