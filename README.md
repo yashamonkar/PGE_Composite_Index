@@ -3,10 +3,11 @@
 
 
 This is the code repository for the paper "A composite index-based instrument for managing the financial risk of variable hydrometerology for electric utilities".
-This work is currently under peer review  (https://www.cell.com/patterns/home). 
-# The document can be found here - https://doi.org/10.1016/j.patter.2022.100454
+This work is currently under peer review. 
 
-All code to replicate the work done in the paper along with the supplementery materials is archived here. The scripts in the /codebase, when run, replicate the entire study along with additional cases and plots for an extensive analysis. Most individual sub-routines are stored as functions in /functions.
+All code to replicate the work done in the paper along with the supplementery materials is archived here. 
+The scripts in the /codebase, when run, replicate the entire study along with additional cases and plots for an extensive analysis. 
+Most individual sub-routines are stored as functions in /functions.
 
 
 
