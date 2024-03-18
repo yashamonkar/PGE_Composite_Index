@@ -1,3 +1,6 @@
+# Ignore Files
+/codebase/Additional/*
+
 # History files
 .Rhistory
 .Rapp.history
